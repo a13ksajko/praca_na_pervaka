@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <random>
+#include <random.h>
 #include <algorithm>
 using namespace std;
 class Lake;
@@ -28,19 +28,19 @@ enum Ability{
 void display_ability(Ability *ability){
 	switch(*ability){
 		case bites:
-			cout<<"кусаться";
+			cout<<"РєСѓСЃР°С‚СЊСЃСЏ";
 			break;
 		case knowshome:
-			cout<<"знать дорогу домой";
+			cout<<"Р·РЅР°С‚СЊ РґРѕСЂРѕРіСѓ РґРѕРјРѕР№";
 			break;
 		case swims:
-			cout<<"плавать";
+			cout<<"РїР»Р°РІР°С‚СЊ";
 			break;
 		case flies:
-			cout<<"летать";
+			cout<<"Р»РµС‚Р°С‚СЊ";
 			break;
 		case fishes:
-			cout<<"рыбачить";
+			cout<<"СЂС‹Р±Р°С‡РёС‚СЊ";
 			break;
 	}
 }
@@ -106,8 +106,8 @@ class Farm{
 	}
 	void display_info_about_hunters();
 	void display_info(){
-		cout<<"Ферма "<<name<<", имеет "<<hunters.size()<<" охотников\n";
-		cout<<"Чтобы сбежать, утке нужно уметь: ";
+		cout<<"Р¤РµСЂРјР° "<<name<<", РёРјРµРµС‚ "<<hunters.size()<<" РѕС…РѕС‚РЅРёРєРѕРІ\n";
+		cout<<"Р§С‚РѕР±С‹ СЃР±РµР¶Р°С‚СЊ, СѓС‚РєРµ РЅСѓР¶РЅРѕ СѓРјРµС‚СЊ: ";
 		for(int i=0;i<toescape.size();i++){
 			if(i!=0)cout<<", ";
 			display_ability(&toescape[i]);
@@ -116,11 +116,11 @@ class Farm{
 	}
 };
 void Lake::display_info(){
-		cout<<"Озеро "<<name<<", на нём "<< ducks.size()<<" уток";
+		cout<<"РћР·РµСЂРѕ "<<name<<", РЅР° РЅС‘Рј "<< ducks.size()<<" СѓС‚РѕРє";
 		if(!wild)
-			cout<<", принадлежит ферме "<<farm->get_name()<<"\n";
+			cout<<", РїСЂРёРЅР°РґР»РµР¶РёС‚ С„РµСЂРјРµ "<<farm->get_name()<<"\n";
 		else
-			cout<<", дикое\n";
+			cout<<", РґРёРєРѕРµ\n";
 	}
 class Attribute{
 	public:
@@ -166,14 +166,14 @@ class Duck{
 		attrs.push_back(*a);
 	}
 	void display_info(){
-		cout<<"Утка вида "<<name<<", дом "<<home<<((canescape)?", крылья не подрезаны":" крылья подрезаны")<<"\n";
-		cout<<"Может: ";
+		cout<<"РЈС‚РєР° РІРёРґР° "<<name<<", РґРѕРј "<<home<<((canescape)?", РєСЂС‹Р»СЊСЏ РЅРµ РїРѕРґСЂРµР·Р°РЅС‹":" РєСЂС‹Р»СЊСЏ РїРѕРґСЂРµР·Р°РЅС‹")<<"\n";
+		cout<<"РњРѕР¶РµС‚: ";
 		for(int i=0;i<abilities.size();i++){
 			if(i!=0)cout<<", ";
 			display_ability(&abilities[i]);
 		}
 		cout<<".\n";
-		cout<<"Свойства: ";
+		cout<<"РЎРІРѕР№СЃС‚РІР°: ";
 		for(int i=0;i<attrs.size();i++){
 			if(i!=0)cout<<", ";
 			attrs[i].display_info();
@@ -203,7 +203,7 @@ class Hunter{
 		this->farm=farm;
 	}	
 	void display_info(){
-		cout<<"Охотник может поймать от "<<min<<" уток до "<<max<<" уток\n";
+		cout<<"РћС…РѕС‚РЅРёРє РјРѕР¶РµС‚ РїРѕР№РјР°С‚СЊ РѕС‚ "<<min<<" СѓС‚РѕРє РґРѕ "<<max<<" СѓС‚РѕРє\n";
 	}
 };
 void Farm::add_hunter(Hunter *hunter){
@@ -212,7 +212,7 @@ void Farm::add_hunter(Hunter *hunter){
 	}
 void Farm::display_info_about_hunters(){
 	for(int i=0;i<hunters.size();i++){
-		cout<<"Охотник №"<<i<<"\n";
+		cout<<"РћС…РѕС‚РЅРёРє в„–"<<i<<"\n";
 		hunters[i].display_info();
 	}
 }
@@ -222,7 +222,7 @@ class Valley{
 	vector <Lake> lakes;
 	vector <Farm> farms;
 	void display_info(){
-		cout<<"В долине "<<lakes.size()<<" диких озер и "<<farms.size()<<" ферм, до конца сезона охоты осталось "<<hunting_days_left<<" дней\n";
+		cout<<"Р’ РґРѕР»РёРЅРµ "<<lakes.size()<<" РґРёРєРёС… РѕР·РµСЂ Рё "<<farms.size()<<" С„РµСЂРј, РґРѕ РєРѕРЅС†Р° СЃРµР·РѕРЅР° РѕС…РѕС‚С‹ РѕСЃС‚Р°Р»РѕСЃСЊ "<<hunting_days_left<<" РґРЅРµР№\n";
 	}
 	void display_info_about_lake(int nlake){
 		lakes[nlake].display_info();
@@ -288,7 +288,7 @@ class Valley{
 					caught+=dist2(r);
 				}
 				if(caught>lakes[targetlake].ducks.size())caught=lakes[targetlake].ducks.size();
-				cout<<"Охотники с фермы "<<farms[i].name<<" отправились на озеро "<<lakes[targetlake].name<<" и поймали "<<caught<<" уток\n";
+				cout<<"РћС…РѕС‚РЅРёРєРё СЃ С„РµСЂРјС‹ "<<farms[i].name<<" РѕС‚РїСЂР°РІРёР»РёСЃСЊ РЅР° РѕР·РµСЂРѕ "<<lakes[targetlake].name<<" Рё РїРѕР№РјР°Р»Рё "<<caught<<" СѓС‚РѕРє\n";
 				for(int j=0;j<caught;j++){
 					std::uniform_int_distribution<int> dist3(0,lakes[targetlake].ducks.size()-1);
 					int nduck=dist3(r);
@@ -296,7 +296,7 @@ class Valley{
 					lakes[targetlake].ducks.erase(lakes[targetlake].ducks.begin()+nduck);
 					if(duck.escaped){
 						duck.canescape=false;
-						cout<<"Утке "<<duck.name<<" подрезали крыло"<<endl;
+						cout<<"РЈС‚РєРµ "<<duck.name<<" РїРѕРґСЂРµР·Р°Р»Рё РєСЂС‹Р»Рѕ"<<endl;
 					}
 					duck.action=true;
 					farms[i].lake->ducks.push_back(duck);
@@ -314,7 +314,7 @@ class Valley{
 				if(chance<5)
 				{
 					Duck duck = farms[i].lake->ducks[j];
-					cout<<"Утка "<<duck.name<<" убежала с фермы "<<farms[i].name<<" на озеро "<<duck.home<<"\n";
+					cout<<"РЈС‚РєР° "<<duck.name<<" СѓР±РµР¶Р°Р»Р° СЃ С„РµСЂРјС‹ "<<farms[i].name<<" РЅР° РѕР·РµСЂРѕ "<<duck.home<<"\n";
 					farms[i].lake->ducks.erase(farms[i].lake->ducks.begin()+j);
 					j-=1;
 					duck.escaped=true;
@@ -341,101 +341,101 @@ class Valley{
 int main(int argc, char** argv) {
 	setlocale(0,"rus");
 	Valley *valley = new Valley(8);
-	Lake *lake = new Lake("Челан",true);
+	Lake *lake = new Lake("Р§РµР»Р°РЅ",true);
 	Duck *duck;
 	Ability *ability;
 	Attribute *attribute;
 	for(int i=0;i<30;i++){
-		duck=new Duck("Гоголь");
+		duck=new Duck("Р“РѕРіРѕР»СЊ");
 		ability = new Ability(flies);
 		duck->add_ability(ability);
 		ability = new Ability(knowshome);
 		duck->add_ability(ability);
-		attribute= new Attribute("Имя","Дональд",-1);
+		attribute= new Attribute("РРјСЏ","Р”РѕРЅР°Р»СЊРґ",-1);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Вес","",5);
+		attribute= new Attribute("Р’РµСЃ","",5);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Размах крыльев","",6);
+		attribute= new Attribute("Р Р°Р·РјР°С… РєСЂС‹Р»СЊРµРІ","",6);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Цвет глаз","Карий",-1);
+		attribute= new Attribute("Р¦РІРµС‚ РіР»Р°Р·","РљР°СЂРёР№",-1);
 		duck->add_attribute(attribute);
 		lake->add_duck(duck);
 	}
 	for(int i=0;i<30;i++){
-		duck=new Duck("Нырка");
+		duck=new Duck("РќС‹СЂРєР°");
 		ability = new Ability(bites);
 		duck->add_ability(ability);
-		attribute= new Attribute("Имя","Дональд",-1);
+		attribute= new Attribute("РРјСЏ","Р”РѕРЅР°Р»СЊРґ",-1);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Вес","",5);
+		attribute= new Attribute("Р’РµСЃ","",5);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Высота","",6);
+		attribute= new Attribute("Р’С‹СЃРѕС‚Р°","",6);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Сила","",8);
+		attribute= new Attribute("РЎРёР»Р°","",8);
 		duck->add_attribute(attribute);
 		lake->add_duck(duck);
 	}
 	valley->add_lake(lake);
-	lake = new Lake("Матано",true);
+	lake = new Lake("РњР°С‚Р°РЅРѕ",true);
 	for(int i=0;i<30;i++){
-		duck=new Duck("Чирок-свистунок");
+		duck=new Duck("Р§РёСЂРѕРє-СЃРІРёСЃС‚СѓРЅРѕРє");
 		ability = new Ability(flies);
 		duck->add_ability(ability);
 		ability = new Ability(knowshome);
 		duck->add_ability(ability);
-		attribute= new Attribute("Имя","Чи",-1);
+		attribute= new Attribute("РРјСЏ","Р§Рё",-1);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Вес","",5);
+		attribute= new Attribute("Р’РµСЃ","",5);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Размер лап","",6);
+		attribute= new Attribute("Р Р°Р·РјРµСЂ Р»Р°Рї","",6);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Выносливость","",3);
+		attribute= new Attribute("Р’С‹РЅРѕСЃР»РёРІРѕСЃС‚СЊ","",3);
 		duck->add_attribute(attribute);
 		lake->add_duck(duck);
 	}
 	for(int i=0;i<30;i++){
-		duck=new Duck("Хохлатая");
+		duck=new Duck("РҐРѕС…Р»Р°С‚Р°СЏ");
 		ability = new Ability(fishes);
 		duck->add_ability(ability);
-		attribute= new Attribute("Имя","Дональд",-1);
+		attribute= new Attribute("РРјСЏ","Р”РѕРЅР°Р»СЊРґ",-1);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Вес","",5);
+		attribute= new Attribute("Р’РµСЃ","",5);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Высота","",6);
+		attribute= new Attribute("Р’С‹СЃРѕС‚Р°","",6);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Размер хвоста","",8);
+		attribute= new Attribute("Р Р°Р·РјРµСЂ С…РІРѕСЃС‚Р°","",8);
 		duck->add_attribute(attribute);
 		lake->add_duck(duck);
 	}
 	valley->add_lake(lake);
-	lake = new Lake("Хауроко",true);
+	lake = new Lake("РҐР°СѓСЂРѕРєРѕ",true);
 	for(int i=0;i<30;i++){
-		duck=new Duck("Нырки");
+		duck=new Duck("РќС‹СЂРєРё");
 		ability = new Ability(swims);
 		duck->add_ability(ability);
 		ability = new Ability(knowshome);
 		duck->add_ability(ability);
-		attribute= new Attribute("Имя","Фамилия",-1);
+		attribute= new Attribute("РРјСЏ","Р¤Р°РјРёР»РёСЏ",-1);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Вес","",5);
+		attribute= new Attribute("Р’РµСЃ","",5);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Хобби","Крякать",-1);
+		attribute= new Attribute("РҐРѕР±Р±Рё","РљСЂСЏРєР°С‚СЊ",-1);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Цвет глаз","Морской волны",-1);
+		attribute= new Attribute("Р¦РІРµС‚ РіР»Р°Р·","РњРѕСЂСЃРєРѕР№ РІРѕР»РЅС‹",-1);
 		duck->add_attribute(attribute);
 		lake->add_duck(duck);
 	}
 	for(int i=0;i<30;i++){
-		duck=new Duck("Хохлатая");
+		duck=new Duck("РҐРѕС…Р»Р°С‚Р°СЏ");
 		ability = new Ability(bites);
 		duck->add_ability(ability);
-		attribute= new Attribute("Имя","Дональд",-1);
+		attribute= new Attribute("РРјСЏ","Р”РѕРЅР°Р»СЊРґ",-1);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Вес","",5);
+		attribute= new Attribute("Р’РµСЃ","",5);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Окрас клюва","желтый",-1);
+		attribute= new Attribute("РћРєСЂР°СЃ РєР»СЋРІР°","Р¶РµР»С‚С‹Р№",-1);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Цвет","сизый",-1);
+		attribute= new Attribute("Р¦РІРµС‚","СЃРёР·С‹Р№",-1);
 		duck->add_attribute(attribute);
 		lake->add_duck(duck);
 	}
@@ -468,39 +468,39 @@ int main(int argc, char** argv) {
 	while(1){
 		switch (state){
 			case main_menu:
-				cout<<"Опции:\n";
-				cout<<"1. Узнать информацию о долине\n";
-				cout<<"2. Сделать ход\n";
-				cout<<"3. Выход\n";
+				cout<<"РћРїС†РёРё:\n";
+				cout<<"1. РЈР·РЅР°С‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РґРѕР»РёРЅРµ\n";
+				cout<<"2. РЎРґРµР»Р°С‚СЊ С…РѕРґ\n";
+				cout<<"3. Р’С‹С…РѕРґ\n";
 				break;
 			case valley_info:
-				cout<<"Опции:\n";
-				cout<<"1. Узнать информацию об озере\n";
-				cout<<"2. Узнать информацию о ферме\n";
-				cout<<"3. В главное меню\n";
+				cout<<"РћРїС†РёРё:\n";
+				cout<<"1. РЈР·РЅР°С‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ РѕР± РѕР·РµСЂРµ\n";
+				cout<<"2. РЈР·РЅР°С‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ С„РµСЂРјРµ\n";
+				cout<<"3. Р’ РіР»Р°РІРЅРѕРµ РјРµРЅСЋ\n";
 				break;
 			case farm_info:
-				cout<<"Опции:\n";
-				cout<<"1. Узнать информацию об озере\n";
-				cout<<"2. Узнать информацию об охотниках\n";
-				cout<<"3. В главное меню\n";
+				cout<<"РћРїС†РёРё:\n";
+				cout<<"1. РЈР·РЅР°С‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ РѕР± РѕР·РµСЂРµ\n";
+				cout<<"2. РЈР·РЅР°С‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ РѕР± РѕС…РѕС‚РЅРёРєР°С…\n";
+				cout<<"3. Р’ РіР»Р°РІРЅРѕРµ РјРµРЅСЋ\n";
 				break;
 			case lake_info:
-				cout<<"Опции:\n";
-				cout<<"1. Узнать информацию об утке\n";
-				cout<<"2. В главное меню\n";
+				cout<<"РћРїС†РёРё:\n";
+				cout<<"1. РЈР·РЅР°С‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ РѕР± СѓС‚РєРµ\n";
+				cout<<"2. Р’ РіР»Р°РІРЅРѕРµ РјРµРЅСЋ\n";
 				break;
 			case input_lake:
-				cout<<"В долине "<<valley->getnlakes()<<" озер\n";
-				cout<<"Введите номер озера:\n";
+				cout<<"Р’ РґРѕР»РёРЅРµ "<<valley->getnlakes()<<" РѕР·РµСЂ\n";
+				cout<<"Р’РІРµРґРёС‚Рµ РЅРѕРјРµСЂ РѕР·РµСЂР°:\n";
 				break;
 			case input_farm:
-				cout<<"В долине "<<valley->getnfarms()<<" ферм\n";
-				cout<<"Введите номер фермы:\n";
+				cout<<"Р’ РґРѕР»РёРЅРµ "<<valley->getnfarms()<<" С„РµСЂРј\n";
+				cout<<"Р’РІРµРґРёС‚Рµ РЅРѕРјРµСЂ С„РµСЂРјС‹:\n";
 				break;
 			case input_duck:
-				cout<<"На озере "<<valley->lake_getnducks(lake)<<" уток\n";
-				cout<<"Введите номер утки:\n";
+				cout<<"РќР° РѕР·РµСЂРµ "<<valley->lake_getnducks(lake)<<" СѓС‚РѕРє\n";
+				cout<<"Р’РІРµРґРёС‚Рµ РЅРѕРјРµСЂ СѓС‚РєРё:\n";
 				break;
 		}
 		
