@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <random.h>
+#include <random>
 #include <algorithm>
 using namespace std;
 class Lake;
