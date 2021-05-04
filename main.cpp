@@ -88,7 +88,7 @@ class Farm{
 		this->random=random;
 		this->name=name;
 		this->lake=lake;
-		lake->assign_farm(this);  //Что это нахуй?
+		lake->assign_farm(this);  //работает и заебись
 	}
 	void add_ability(Ability *a){
 		toescape.push_back(*a);
