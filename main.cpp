@@ -90,7 +90,7 @@ class Farm{
 		this->random=random;
 		this->name=name;
 		this->lake=lake;
-		lake->assign_farm(this);  //Работает и заебись
+		lake->assign_farm(this);  //Что это нахуй?
 	}
 	void add_ability(Ability *a){
 		toescape.push_back(*a);
@@ -439,7 +439,7 @@ int main(int argc, char** argv) {
 	ability = new Ability(fishes);
 	allabilities.push_back(*ability);
 	Attribute *attribute;
-	int id=0;
+	int id=1;
 	for(int i=0;i<30;i++){
 		duck=new Duck("Гоголь",id++);
 		ability = new Ability(flies);
@@ -534,6 +534,7 @@ int main(int argc, char** argv) {
 		duck->add_attribute(attribute);
 		lake->add_duck(duck);
 	}
+	int maxid=id-1;
 	valley->add_lake(lake);
 	lake = new Lake("RUCEFOLO",false);
 	Farm *farm = new Farm("RUCEFOLO",lake,true);
@@ -685,6 +686,7 @@ int main(int argc, char** argv) {
 		}else{
 			istringstream ss(option);
 			_flushall();
+			num=-1;
 			ss>>num;
 			switch(state){
 				case input_farm:
@@ -720,6 +722,12 @@ int main(int argc, char** argv) {
 					state=main_menu;
 					break;
 				case input_id:
+					while(!((num>=0)&&(num<=maxid))){
+						cout<<"Введите корректный id\n";
+						cin>>option;
+						istringstream ss2(option);
+						ss2>>num;
+					}
 					valley->display_info_about_duck_by_id(num);
 					state=main_menu;
 					break;
