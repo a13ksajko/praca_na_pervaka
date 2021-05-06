@@ -23,7 +23,7 @@ enum State{
 	input_id	
 };
 enum Ability{
-	bites, knowshome, swims, flies, fishes //don't forget to add one of each to "allabilities" vector!
+	bites, knowshome, swims, flies, fishes
 };
 vector<Ability> allabilities;
 void display_ability(Ability *ability){
@@ -90,7 +90,7 @@ class Farm{
 		this->random=random;
 		this->name=name;
 		this->lake=lake;
-		lake->assign_farm(this);  //работает и заебись
+		lake->assign_farm(this);
 	}
 	void add_ability(Ability *a){
 		toescape.push_back(*a);
@@ -323,6 +323,7 @@ class Valley{
 		cout<<"Утка с таким id не найдена\n";
 	}
 	void simulate(){
+		int k=0;
     	mt19937 r(static_cast<unsigned int>(time(0)));
 		if(hunting_days_left>0)
 			for(int i=0;i<farms.size();i++){
@@ -340,19 +341,25 @@ class Valley{
 				for(int j=0;j<caught;j++){
 					uniform_int_distribution<int> dist3(0,lakes[targetlake].ducks.size()-1);		
 					int nduck=dist3(r);
-					if (std::find(caughtvec.begin(), caughtvec.end(), nduck) != caughtvec.end()){
+					if (find(caughtvec.begin(), caughtvec.end(), lakes[targetlake].ducks[nduck].id) != caughtvec.end()){
 						j-=1;
 						continue;
 					}
-					caughtvec.push_back(nduck);
+					caughtvec.push_back(lakes[targetlake].ducks[nduck].id);
 				}
-				cout<<caughtvec.size()<<"\n";
+				k=0;
 				bool bites_bool;
 				bites_bool=false;
 				for(int j=0;j<caughtvec.size();j++){
-					Duck duck=lakes[targetlake].ducks[caughtvec[j]];
+					for(int l=0;l<lakes[targetlake].ducks.size();l++){
+						if(lakes[targetlake].ducks[l].id==caughtvec[j]){
+							k=l;
+							break;
+						}
+					}
+					Duck duck=lakes[targetlake].ducks[k];
 					Ability ability(bites);
-					if (std::find(lakes[targetlake].ducks[caughtvec[j]].abilities.begin(), lakes[targetlake].ducks[caughtvec[j]].abilities.end(), ability) != lakes[targetlake].ducks[caughtvec[j]].abilities.end())
+					if (find(lakes[targetlake].ducks[k].abilities.begin(), lakes[targetlake].ducks[k].abilities.end(), ability) != lakes[targetlake].ducks[k].abilities.end())
 						bites_bool=true;
 					uniform_int_distribution<int> dist3(0,(bites_bool)?100:49);		
 					int chance=dist3(r);
@@ -360,7 +367,7 @@ class Valley{
 						cout<<"Утке "<<duck.name<<"(id="<<duck.id<<") удалось укусить охотника и убежать\n";
 						continue;
 					}
-					lakes[targetlake].ducks.erase(lakes[targetlake].ducks.begin()+caughtvec[j]);
+					lakes[targetlake].ducks.erase(lakes[targetlake].ducks.begin()+k);
 					cout<<"Утка "<<duck.name<<"(id="<<duck.id<<") поймана";
 					if(duck.escaped){
 						duck.canescape=false;
