@@ -1,0 +1,559 @@
+#include <iostream>
+#include <locale>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <random>
+#include <algorithm>
+
+using namespace std;
+
+enum State{			
+	dial_okno,		
+	dol_info,	
+	ozero_1,		
+	ozero_2,		
+	ferma_1,
+	ferma_2,
+	inf_ob_ytke,
+	inf_id	
+};
+
+class Ozero;
+class Ferma;
+class Ytka;
+class Dol;
+class Ohotnik;
+
+class Ozero{
+	public:
+	string name;
+	bool dikoe_ozero;
+	vector <Ytka> ytki;
+	Ferma *ferma;
+	Ozero(string name, bool dikoe_ozero){
+		this->name=name;
+		this->dikoe_ozero=dikoe_ozero;
+	}
+	void add_ytka(Ytka *ytka);
+	void set_ferma(Ferma *ferma){
+		this->ferma=ferma;
+	}
+	int get_n_ytki(){
+		return ytki.size();
+	}
+	void inf_dialog_okno();
+	void dialog_inf_ytka(int n_ytka);
+};
+
+class Ferma{
+	public:
+	string name;
+	vector <Ohotnik> ohotniki;
+	Ozero *ozero;
+	bool  random;
+	Ferma(string name, Ozero *ozero, bool random){
+		this->random=random;
+		this->name=name;
+		this->ozero=ozero;
+		ozero->set_ferma(this);
+	}
+	void add_ohotnik(Ohotnik *ohotnik);
+	string get_name(){
+		return name;
+	}
+	void info_ozero(){
+		ozero->inf_dialog_okno();
+	}
+	void inf_dialog_okno_about_ohotniki();
+	void inf_dialog_okno(){
+		cout<<"Ферма "<<name<<", имеет "<<ohotniki.size()<<" охотников"<<endl;
+		cout<<"Чтобы сбежать, утке нужно уметь: плавать и знать где она живет"<<endl;
+	}
+};
+
+class Ytka{
+	public:
+	string name;
+	string ability[2]; 
+	string attrs;
+	vector <string> path;
+	string home, ozero;
+	int id;
+	bool canescape;
+	bool escaped;
+	bool action;
+	Ytka(string name, int id){
+		this->name=name;
+		canescape=true;
+		escaped=false;
+		action=false;
+		this->id=id;
+	}
+	void assign_ozero(Ozero *home){
+		this->ozero=home->name;
+		this->home=home->name;
+		path.push_back(home->name);
+	}
+	void inf_dialog_okno(){
+		cout<<"Утка вида "<<name<<", id="<<id<<", дом "<<home<<((canescape)?", крылья не подрезаны":" крылья подрезаны")<<"\n";
+		cout<<"Умения: "<<ability[0]<<", "<<ability[1]<<endl;
+		cout<<"Атрибуты: "<<attrs<<endl;
+		cout<<"Её путь:\n";
+		for(int i=0;i<path.size();i++){
+			cout<<i+1<<". "<<path[i]<<"\n";
+		}
+		cout<<"\n";
+	}
+};
+
+class Ohotnik{
+	public:
+	int min, max;
+	int number;
+	Ferma *ferma;
+	Ohotnik(int min, int max){
+		this->min=min;
+		this->max=max;
+	}
+	void set_ferma(Ferma *ferma){
+		this->ferma=ferma;
+	}	
+	void inf_dialog_okno(){
+		cout<<"Охотник может поймать от "<<min<<" уток до "<<max<<" уток\n";
+	}
+};
+
+class Dol{
+	public:
+	int ost_dney;
+	vector <Ozero> ozera;
+	vector <Ferma> fermi;
+	void inf_dialog_okno(){
+		if(ost_dney>=0)
+			cout<<"Долина:\nДикие озера = "<<ozera.size()<<"\nФермы = "<<fermi.size()<<"\nДо конца сезона охоты дней осталось = "<<ost_dney<<endl;
+			else
+			cout<<"Долина:\nДикие озера = "<<ozera.size()<<"\nФермы = "<<fermi.size()<<"\nСезон охоты закончился"<<endl;
+	}
+	void info_ozero(int nozero){
+		ozera[nozero].inf_dialog_okno();
+	}
+	void info_ferma(int nferma){
+		fermi[nferma].inf_dialog_okno();
+	}
+	void info_ferm_ozero(Ferma *ferma){
+		ferma->info_ozero();
+	}
+	void info_ohotniki(Ferma *ferma){
+		ferma->inf_dialog_okno_about_ohotniki();
+	}
+	Dol(int ost_dney){
+		this->ost_dney=ost_dney;
+	}
+	void add_ozero(Ozero *ozero){
+		ozera.push_back(*ozero);
+	}
+	void add_ferma(Ferma *ferma){
+		fermi.push_back(*ferma);
+	}
+	int getdays(){
+		return ost_dney;
+	}
+	void day_passes(){
+		ost_dney-=1;
+	}
+	Ozero *get_ozero(int nozero){
+		return &ozera[nozero];
+	}
+	Ferma *get_ferma(int nferma){
+		return &fermi[nferma];
+	}
+	int getnozera(){
+		return ozera.size();
+	}
+	int getnfermi(){
+		return fermi.size();
+	}
+	int ozero_get_n_ytki(Ozero *ozero){
+		return ozero->get_n_ytki();
+	}
+	Ozero *findozero(string name){
+		for(int i=0;i<ozera.size();i++){
+			if(ozera[i].name==name)
+			return &ozera[i];
+		}
+		return NULL;
+	}
+	void dialog_inf_ytka_by_id(int id){
+		for(int i=0;i<ozera.size();i++){
+			for(int j=0;j<ozera[i].ytki.size();j++){
+				if(ozera[i].ytki[j].id==id){
+					ozera[i].ytki[j].inf_dialog_okno();
+					return;
+				}
+			}
+		}
+		for(int i=0;i<fermi.size();i++){
+			for(int j=0;j<fermi[i].ozero->ytki.size();j++){
+				if(fermi[i].ozero->ytki[j].id==id){
+					fermi[i].ozero->ytki[j].inf_dialog_okno();
+					return;
+				}
+			}
+		}
+		cout<<"Утка с таким id не найдена\n";
+	}
+	void simulate(){
+		int k=0;
+    	mt19937 r(static_cast<unsigned int>(time(0)));
+		if(ost_dney>0)
+			for(int i=0;i<fermi.size();i++){
+				uniform_int_distribution<int> dist(0,ozera.size()-1);
+				int vibor=dist(r);
+				int ykrad_ytki;
+				ykrad_ytki=0;
+				for(int j=0;j<fermi[i].ohotniki.size();j++){
+					uniform_int_distribution<int> dist2(fermi[i].ohotniki[j].min,fermi[i].ohotniki[j].max-1);
+					ykrad_ytki+=dist2(r);
+				}
+				if(ykrad_ytki>ozera[vibor].ytki.size())ykrad_ytki=ozera[vibor].ytki.size();		
+				cout<<((fermi[i].ohotniki.size()==1)?"Охотник с фермы ":"Охотники с фермы ")<<fermi[i].name<<" отправились на озеро "<<ozera[vibor].name<<" и поймали "<<ykrad_ytki<<" уток\n";
+				vector <int> poiman_ytki;
+				for(int j=0;j<ykrad_ytki;j++){
+					uniform_int_distribution<int> dist3(0,ozera[vibor].ytki.size()-1);		
+					int n_ytka=dist3(r);
+					if (find(poiman_ytki.begin(), poiman_ytki.end(), ozera[vibor].ytki[n_ytka].id) != poiman_ytki.end()){
+						j-=1;
+						continue;
+					}
+					poiman_ytki.push_back(ozera[vibor].ytki[n_ytka].id);
+				}
+				k=0;
+				for(int j=0;j<poiman_ytki.size();j++){
+					for(int l=0;l<ozera[vibor].ytki.size();l++){
+						if(ozera[vibor].ytki[l].id==poiman_ytki[j]){
+							k=l;
+							break;
+						}
+					}
+					Ytka ytka=ozera[vibor].ytki[k];
+					ozera[vibor].ytki.erase(ozera[vibor].ytki.begin()+k);
+					cout<<ytka.name<<" под номером "<<ytka.id<<" поймана";
+					if(ytka.escaped){
+						ytka.canescape=false;
+						cout<<" ей подрезали крыло\n";
+					}else{
+						cout<<"\n";
+					}
+					ytka.action=true;
+					ytka.path.push_back(fermi[i].ozero->name);
+					fermi[i].ozero->ytki.push_back(ytka);
+				}
+				poiman_ytki.clear();
+			}
+		for(int i=0;i<fermi.size();i++){
+			for(int j=0;j<fermi[i].ozero->ytki.size();j++){
+				if(fermi[i].ozero->ytki[j].action)continue;
+				if(!fermi[i].ozero->ytki[j].canescape)continue;
+				uniform_int_distribution<int> dist3(0,9);
+				int chance=dist3(r);	
+				if((fermi[i].ozero->ytki[j].ability[0]=="плавать")&&(fermi[i].ozero->ytki[j].ability[1]=="знает"))
+				if(chance<5)
+				{
+					Ytka ytka = fermi[i].ozero->ytki[j];
+					cout<<"Утка "<<ytka.name<<"(id="<<ytka.id<<") убежала с фермы "<<fermi[i].name;
+					uniform_int_distribution<int> dist4(0,ozera.size()-1);
+					ytka.home=ozera[dist4(r)].name;
+					cout<<" на случайное озеро "<<ytka.home<<"\n";
+					fermi[i].ozero->ytki.erase(fermi[i].ozero->ytki.begin()+j);
+					j-=1;
+					ytka.escaped=true;
+					ytka.action=true;
+					ytka.path.push_back(ytka.home);
+					findozero(ytka.home)->ytki.push_back(ytka);
+				}
+			}
+		}
+		for(int i=0;i<fermi.size();i++){
+			for(int j=0;j<fermi[i].ozero->ytki.size();j++){
+				fermi[i].ozero->ytki[j].action=false;
+			}
+		}
+		for(int i=0;i<ozera.size();i++){
+			for(int j=0;j<ozera[i].ytki.size();j++){
+				ozera[i].ytki[j].action=false;
+			}
+		}
+		ost_dney--;
+	}
+};
+
+void Ozero::inf_dialog_okno(){   
+	cout<<"Озеро "<<name<<", на нём "<< ytki.size()<<" уток";
+	if(!dikoe_ozero)
+		cout<<", принадлежит ферме "<<ferma->get_name()<<"\n";
+	else
+		cout<<", дикое\n";
+	int k1=0,k2=0,k3=0;
+	for(int i=0;i<ytki.size();i++){
+		if(ytki[i].ability[0]=="летать")k1++;
+		if(ytki[i].ability[1]=="знать где дом")k2++;
+		if((ytki[i].ability[0]=="плавать")&&(ytki[i].ability[0]=="знать где дом"))k3++;
+	}
+	cout<<"Умеют летать <=> "<<k1<<endl;
+	cout<<"Умеют плавать <=> "<<ytki.size()-k1<<endl;
+	cout<<"Знают где они живут <=> "<<k2<<endl;
+	cout<<"Не знают где они живут <=> "<<ytki.size()-k2<<endl;
+	if(!dikoe_ozero)cout<<"Могут сбежать <=> "<<k3<<endl;
+}
+
+void Ozero::dialog_inf_ytka(int n_ytka){
+	ytki[n_ytka].inf_dialog_okno();
+}
+
+void Ozero::add_ytka(Ytka *ytka){
+	ytka->assign_ozero(this);
+	ytki.push_back(*ytka);
+}
+
+void Ferma::add_ohotnik(Ohotnik *ohotnik){
+	ohotniki.push_back(*ohotnik);
+	ohotnik->set_ferma(this);
+}
+
+void Ferma::inf_dialog_okno_about_ohotniki(){
+	for(int i=0;i<ohotniki.size();i++){
+		cout<<"Охотник #"<<i+1<<"\n";
+		ohotniki[i].inf_dialog_okno();
+	}
+}
+
+int main(int argc, char** argv) {
+	setlocale(0,"rus");
+	Ytka *ytka;
+	int id=1;
+	Dol *dol = new Dol(8);
+	Ozero *ozero = new Ozero("Ньяса-1",true);
+	for(int i=0;i<5;i++){
+		ytka=new Ytka("Хохлатая утка",id++);
+		ytka->ability[0]="плавать";
+		ytka->ability[1]="знать где дом";
+		ytka->attrs="Имя-Кряква, Вес=3 кг, Высота=60 см, Форма лап-обыкновенная";
+		ozero->add_ytka(ytka);
+	}
+	for(int i=0;i<5;i++){
+		ytka=new Ytka("Чернети",id++);
+		ytka->ability[0]="плавать";
+		ytka->ability[1]="знать где дом";
+		ytka->attrs="Имя-Веня, Вес=2.5 кг, Размах крыльев=25 см, Здоровье-в норме";
+		ozero->add_ytka(ytka);
+	}
+	dol->add_ozero(ozero);
+	ozero = new Ozero("Тоба",true);
+	for(int i=0;i<5;i++){
+		ytka=new Ytka("Крохали",id++);
+		ytka->ability[0]="летать";
+		ytka->ability[1]="не знать где дом";
+		ytka->attrs="Имя-Чу, Вес=3 кг, Окрас оперения-зелёный, Окрас хвоста-голубой";
+		ozero->add_ytka(ytka);
+	}
+	for(int i=0;i<5;i++){
+		ytka=new Ytka("Широконоска",id++);
+		ytka->ability[0]="летать";
+		ytka->ability[1]="не знать где дом";
+		ytka->attrs="Имя-Вася, Вес=1.5 кг, Размер лап=42, Высота в холке=20 см";
+		ozero->add_ytka(ytka);
+	}
+	dol->add_ozero(ozero);
+	ozero = new Ozero("Ньяса-2",true);
+	for(int i=0;i<5;i++){
+		ytka=new Ytka("Голубокрылый чирок",id++);
+		ytka->ability[0]="летать";
+		ytka->ability[1]="знать где дом";
+		ytka->attrs="Имя-Саша, Вес=2 кг, Окрас хвоста-жёлтый, Здоровье-хорошее";
+		ozero->add_ytka(ytka);
+	}
+	for(int i=0;i<5;i++){
+		ytka=new Ytka("Желтоклювый чирок",id++);
+		ytka->ability[0]="летать";
+		ytka->ability[1]="не знать где дом";
+		ytka->attrs="Имя-Алексашко, Вес=2.3 кг, Размах крыльев=27 см, Ловкость=79/100";
+		ozero->add_ytka(ytka);
+	}
+	dol->add_ozero(ozero);
+	ozero = new Ozero("Аргентино",true);
+	for(int i=0;i<5;i++){
+		ytka=new Ytka("Пеганки",id++);
+		ytka->ability[0]="летать";
+		ytka->ability[1]="не знать где дом";
+		ytka->attrs="Имя-Кроп, Вес=1.9 кг, Окрас крыльев-чёрный, Форма клюва-обычная";
+		ozero->add_ytka(ytka);
+	}
+	for(int i=0;i<6;i++){
+		ytka=new Ytka("Нырки",id++);
+		ytka->ability[0]="летать";
+		ytka->ability[1]="знать где дом";
+		ytka->attrs="Имя-Вира, Вес=1.3 кг, Любимое блюдо-хлеб, Ловкость=24/100";
+		ozero->add_ytka(ytka);
+	}
+	dol->add_ozero(ozero);
+	ozero = new Ozero("RIWENIKA",false);
+	Ferma *ferma = new Ferma("RIWENIKA",ozero,true);
+	Ohotnik *ohotnik = new Ohotnik(2,10);
+	ferma->add_ohotnik(ohotnik);
+	dol->add_ferma(ferma);
+	string option="";
+	int opt=0;
+	State state=dial_okno;
+	bool nextoption=true;
+	int number=0;
+	while(1){
+		switch (state){
+			case dial_okno:
+				cout<<((option=="")?"":"\n")<<"\\-----Выбор-----/"<<endl;
+				cout<<"Охота (1)"<<endl;
+				cout<<"Информация о долине (2)"<<endl;
+				cout<<"Выход (3)"<<endl;
+				_flushall();
+				break;
+			case dol_info:
+				cout<<((option=="")?"":"\n")<<"\\-----Выбор-----/"<<endl;
+				cout<<"Информация об озере (1)"<<endl;
+				cout<<"Информация о ферме (2)"<<endl;
+				cout<<"В главное меню (3)"<<endl;
+				_flushall();
+				break;
+			case ferma_1:
+				cout<<((option=="")?"":"\n")<<"\\-----Выбор-----/"<<endl;
+				cout<<"Информация об озере (1)"<<endl;
+				cout<<"Информация об охотниках (2)"<<endl;
+				cout<<"В главное меню (3)"<<endl;
+				_flushall();
+				break;
+			case ozero_1:
+				cout<<((option=="")?"":"\n")<<"\\-----Выбор-----/"<<endl;
+				cout<<"Информация об утке (1)"<<endl;
+				cout<<"В главное меню (2)"<<endl;
+				_flushall();
+				break;
+			case ozero_2:
+				cout<<"Озёр в долине = "<<dol->getnozera()<<endl;
+				cout<<"Введите номер озера:"<<endl;
+				_flushall();
+				break;
+			case ferma_2:
+				cout<<"Ферм в долине = "<<dol->getnfermi()<<endl;
+				cout<<"Введите номер фермы:"<<endl;
+				_flushall();
+				break;
+			case inf_ob_ytke:
+				cout<<"Уток на озере = "<<dol->ozero_get_n_ytki(ozero)<<endl;
+				cout<<"Введите номер утки:"<<endl;
+				_flushall();
+				break;
+			case inf_id:
+				cout<<"Введите ID утки:"<<endl;
+				_flushall();
+				break;
+		}
+		cin>>option;
+		cout<<"\n";
+		if(nextoption)
+		switch(option[0]){
+			case '1':
+				switch(state){
+					case dial_okno:
+						dol->simulate();
+						break;
+					case dol_info:
+						state=ozero_2;
+						nextoption=false;
+						break;
+					case ozero_1:
+						if(ozero->ytki.size()==0){
+							cout<<"Уток на ферме нет"<<endl;
+							break;
+						}else{	
+							state=inf_ob_ytke;
+							nextoption=false;
+							break;
+						}
+					case ferma_1:
+						state=ozero_1;
+						ozero=ferma->ozero;
+						dol->info_ferm_ozero(ferma);
+						break;
+				}
+				break;
+			case '2':
+				switch(state){
+					case dial_okno:
+						dol->inf_dialog_okno();
+						state=dol_info;	
+						break;
+					case ozero_1:
+						state=dial_okno;
+						break;
+					case dol_info:
+						state=ferma_2;
+						nextoption=false;
+						break;
+					case ferma_1:
+						state=dial_okno;
+						dol->info_ohotniki(ferma);
+						break;
+				}
+				break;
+			case '3':
+				switch (state){
+					case dial_okno:
+						return 0;
+						break;	
+					case ferma_1:
+						state=dial_okno;
+						break;
+					case dol_info:
+						state=dial_okno;
+						break;
+				}
+		}else{
+			istringstream ss(option);
+			_flushall();
+			ss>>number;
+			switch(state){
+				case ferma_2:
+					while(!((number>0)&&(number-1<(dol->fermi.size())))){
+						cout<<"Введите номер фермы"<<endl;
+						cin>>number;
+					}					
+					dol->info_ferma(number-1);
+					state=ferma_1;
+					ferma=dol->get_ferma(number-1);
+					break;
+				case ozero_2:
+					while(!((number>0)&&(number-1<(dol->ozera.size())))){
+						cout<<"Введите номер озера"<<endl;
+						cin>>number;
+					}
+					dol->info_ozero(number-1);
+					state=ozero_1;
+					ozero=dol->get_ozero(number-1);
+					break;
+				case inf_ob_ytke:
+					while(!((number>0)&&(number-1<(dol->ozero_get_n_ytki(ozero))))){
+						cout<<"Введите номер утки"<<endl;
+						cin>>number;
+					}
+					ozero->dialog_inf_ytka(number-1);
+					state=dial_okno;
+					break;
+				case inf_id:
+					dol->dialog_inf_ytka_by_id(number);
+					state=dial_okno;
+					break;
+			}
+			nextoption=true;
+		}
+	}
+	return 0;
+}
