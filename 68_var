@@ -23,7 +23,7 @@ enum State{
 	input_id	
 };
 enum Ability{
-	bites, knowshome, swims, flies, fishes
+	bites, knowshome, not_knowshome, swims, flies, fishes
 };
 vector<Ability> allabilities;
 void display_ability(Ability *ability){
@@ -33,6 +33,9 @@ void display_ability(Ability *ability){
 			break;
 		case knowshome:
 			cout<<"знать дорогу домой";
+			break;
+		case not_knowshome:
+			cout<<"не знать дорогу домой";
 			break;
 		case swims:
 			cout<<"плавать";
@@ -107,7 +110,7 @@ class Farm{
 		cout<<"Ферма "<<name<<", имеет "<<hunters.size()<<" охотников\n";
 		cout<<"Чтобы сбежать, утке нужно уметь: ";
 		for(int i=0;i<toescape.size();i++){
-			if(i!=0)cout<<", ";
+			if(i!=0)cout<<" и ";
 			display_ability(&toescape[i]);
 		}
 		cout<<".\n";
@@ -161,7 +164,7 @@ class Duck{
 		attrs.push_back(*a);
 	}
 	void display_info(){
-		cout<<"Утка вида "<<name<<", id="<<id<<", дом "<<home<<((canescape)?", крылья не подрезаны":" крылья подрезаны")<<"\n";
+		cout<<"Утка вида "<<name<<", id="<<id<<", дом "<<home<<((canescape)?", крылья не подрезаны":", крылья подрезаны")<<"\n";
 		cout<<"Может: ";
 		for(int i=0;i<abilities.size();i++){
 			if(i!=0)cout<<", ";
@@ -174,9 +177,10 @@ class Duck{
 			attrs[i].display_info();
 		}
 		cout<<"\n";
-		cout<<"Её путь: ";
+		cout<<"Её путь:\n";
 		for(int i=0;i<path.size();i++){
-			cout<<path[i]<<", ";
+			//cout<<path[i]<<", ";
+			cout<<i+1<<". "<<path[i]<<"\n";
 		}
 		cout<<"\n";
 	}
@@ -193,17 +197,18 @@ void Lake::display_info(){
 			c=0;
 			for(int j=0;j<ducks.size();j++){
 			
-				if (std::find(ducks[j].abilities.begin(), ducks[j].abilities.end(), allabilities[i]) != ducks[j].abilities.end()){
+				if (find(ducks[j].abilities.begin(), ducks[j].abilities.end(), allabilities[i]) != ducks[j].abilities.end()){
 					c+=1;
 				}
 			}
 			count.push_back(c);
 		}
-		cout<<"Среди уток: ";
+		cout<<"Среди уток:\n";
 		for(int i=0;i<allabilities.size();i++){
 			if(count[i]==0)continue;
+			cout<<"\t";
 			display_ability(&allabilities[i]);
-			cout<<" - "<<count[i]<<", ";
+			cout<<" - "<<count[i]<<"\n";
 		}
 		cout<<"\n";
 		count.clear();
@@ -432,12 +437,15 @@ class Valley{
 int main(int argc, char** argv) {
 	setlocale(0,"rus");
 	Valley *valley = new Valley(8);
-	Lake *lake = new Lake("Челан",true);
 	Duck *duck;
+	Attribute *attribute;
 	Ability *ability;
-	ability = new Ability(bites);
-	allabilities.push_back(*ability);
+	int id=1;
 	ability = new Ability(knowshome);
+	allabilities.push_back(*ability);
+	ability = new Ability(not_knowshome);
+	allabilities.push_back(*ability);
+	ability = new Ability(bites);
 	allabilities.push_back(*ability);
 	ability = new Ability(swims);
 	allabilities.push_back(*ability);
@@ -445,19 +453,18 @@ int main(int argc, char** argv) {
 	allabilities.push_back(*ability); 
 	ability = new Ability(fishes);
 	allabilities.push_back(*ability);
-	Attribute *attribute;
-	int id=1;
+	Lake *lake = new Lake("Челан",true);
 	for(int i=0;i<30;i++){
 		duck=new Duck("Гоголь",id++);
 		ability = new Ability(flies);
 		duck->add_ability(ability);
 		ability = new Ability(knowshome);
 		duck->add_ability(ability);
-		attribute= new Attribute("Имя","Дональд",-1);
+		attribute= new Attribute("Имя","Гегель",-1);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Вес","",5);
+		attribute= new Attribute("Вес","",2);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Размах крыльев","",6);
+		attribute= new Attribute("Размах крыльев","",3);
 		duck->add_attribute(attribute);
 		attribute= new Attribute("Цвет глаз","Карий",-1);
 		duck->add_attribute(attribute);
@@ -467,13 +474,15 @@ int main(int argc, char** argv) {
 		duck=new Duck("Нырка",id++);
 		ability = new Ability(bites);
 		duck->add_ability(ability);
+		ability = new Ability(not_knowshome);
+		duck->add_ability(ability);
 		attribute= new Attribute("Имя","Дональд",-1);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Вес","",5);
+		attribute= new Attribute("Вес","",3);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Высота","",6);
+		attribute= new Attribute("Высота","",2);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Сила","",8);
+		attribute= new Attribute("Сила","",2);
 		duck->add_attribute(attribute);
 		lake->add_duck(duck);
 	}
@@ -485,11 +494,11 @@ int main(int argc, char** argv) {
 		duck->add_ability(ability);
 		ability = new Ability(knowshome);
 		duck->add_ability(ability);
-		attribute= new Attribute("Имя","Чи",-1);
+		attribute= new Attribute("Имя","Черри",-1);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Вес","",5);
+		attribute= new Attribute("Вес","",2);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Размер лап","",6);
+		attribute= new Attribute("Размер лап","",5);
 		duck->add_attribute(attribute);
 		attribute= new Attribute("Выносливость","",3);
 		duck->add_attribute(attribute);
@@ -499,13 +508,15 @@ int main(int argc, char** argv) {
 		duck=new Duck("Хохлатая",id++);
 		ability = new Ability(fishes);
 		duck->add_ability(ability);
-		attribute= new Attribute("Имя","Дональд",-1);
+		ability = new Ability(not_knowshome);
+		duck->add_ability(ability);
+		attribute= new Attribute("Имя","Пышка",-1);
 		duck->add_attribute(attribute);
 		attribute= new Attribute("Вес","",5);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Высота","",6);
+		attribute= new Attribute("Высота","",3);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Размер хвоста","",8);
+		attribute= new Attribute("Размер хвоста","маленький",-1);
 		duck->add_attribute(attribute);
 		lake->add_duck(duck);
 	}
@@ -517,13 +528,13 @@ int main(int argc, char** argv) {
 		duck->add_ability(ability);
 		ability = new Ability(knowshome);
 		duck->add_ability(ability);
-		attribute= new Attribute("Имя","Фамилия",-1);
+		attribute= new Attribute("Имя","Марк",-1);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Вес","",5);
+		attribute= new Attribute("Вес","",3);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Хобби","Диалектика",-1);
+		attribute= new Attribute("Хобби","диалектика",-1);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Цвет глаз","Морской волны",-1);
+		attribute= new Attribute("Цвет глаз","морской волны",-1);
 		duck->add_attribute(attribute);
 		lake->add_duck(duck);
 	}
@@ -531,18 +542,20 @@ int main(int argc, char** argv) {
 		duck=new Duck("Хохлатая",id++);
 		ability = new Ability(bites);
 		duck->add_ability(ability);
-		attribute= new Attribute("Имя","Володiмiр",-1);
+		ability = new Ability(not_knowshome);
+		duck->add_ability(ability);
+		attribute= new Attribute("Имя","Лавра",-1);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Вес","",5);
+		attribute= new Attribute("Вес","",3);
 		duck->add_attribute(attribute);
-		attribute= new Attribute("Окрас клюва","желтый",-1);
+		attribute= new Attribute("Окрас клюва","светлый",-1);
 		duck->add_attribute(attribute);
 		attribute= new Attribute("Цвет","сизый",-1);
 		duck->add_attribute(attribute);
 		lake->add_duck(duck);
 	}
-	int maxid=id-1;
 	valley->add_lake(lake);
+	int maxid=id-1;
 	lake = new Lake("RUCEFOLO",false);
 	Farm *farm = new Farm("RUCEFOLO",lake,true);
 	ability = new Ability(swims);
@@ -708,7 +721,7 @@ int main(int argc, char** argv) {
 					farm=valley->get_farm(num-1);
 					break;
 				case input_lake:
-					while(!((num>0)&&(num-1<(valley->lakes.size())))){
+					while(!((num>0)&&(num<=(valley->lakes.size())))){
 						cout<<"Введите корректный номер озера\n";
 						cin>>option;
 						istringstream ss2(option);
