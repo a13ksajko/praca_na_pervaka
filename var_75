@@ -1,0 +1,553 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <random>
+#include <algorithm>
+
+using namespace std;
+
+const int menu1=1, menu2=2, menu3=3, menu4=4, menu5=5, menu6=6, menu7=7;
+
+class Lake;
+class Farm;
+class Duck;
+class Valley;
+class Hunter;
+
+class Lake{
+	public:
+	bool fl_x;
+	string name;
+	Farm *farm;
+	vector <Duck> ducks;
+	void add_duck(Duck *duck);
+	void set_farm(Farm *farm){
+		this->farm=farm;
+	}
+	int get_n_ducks(){
+		return ducks.size();
+	}
+	void display_info();
+	void display_duck(int nduck);
+	Lake(string name, bool fl_x){
+		this->name=name;
+		this->fl_x=fl_x;
+	}
+};
+
+class Farm{
+	public:
+	string name;
+	Lake *lake;
+	bool  random;
+	vector <Hunter> hunters;
+	void add_hunter(Hunter *hunter);
+	Farm(string name, Lake *lake, bool random){
+		this->random=random;
+		this->name=name;
+		this->lake=lake;
+		lake->set_farm(this);
+	}
+	string get_name(){
+		return name;
+	}
+	void display_lake(){
+		lake->display_info();
+	}
+	void display_info(){
+		cout<<"Farm "<<name<<", has "<<hunters.size()<<" hunters\n";
+		cout<<"To escape, duck has to be able to: swim, know the way home"<<endl;
+	}
+	void display_hunters();
+};
+
+class Duck{
+	public:
+	string attrs;
+	string name;
+	string home, lake;
+	int id;
+	string ability[2];
+	bool canescape;
+	bool escaped;
+	bool action;
+	Duck(string name, int id){
+		this->name=name;
+		canescape=true;
+		escaped=false;
+		action=false;
+		this->id=id;
+	}
+	void set_lake(Lake *home){
+		this->lake=home->name;
+		this->home=home->name;
+	}
+	void display_info(){
+		cout<<"Duck of kind "<<name<<", id="<<id<<", house "<<home<<((canescape)?", wings not cut":" wings cut")<<"\n";
+		cout<<"Abilities:\n"<<ability[0]<<", "<<ability[1]<<endl;	
+		cout<<"Attributes:\n"<<attrs<<endl;
+	}
+};
+
+void Lake::display_info(){   
+	int fl=0, kn=0, esc=0;
+	cout<<"Lake "<<name<<", has "<< ducks.size()<<" ducks";
+		if(!fl_x)
+			cout<<", belongs to farm "<<farm->get_name()<<"\n";
+		else
+			cout<<", wild\n";
+		cout<<"Among them:\n";
+		for(int i=0;i<ducks.size();i++){
+		if(ducks[i].ability[0]=="flies")fl++;
+		if(ducks[i].ability[1]=="knows the way home")kn++;
+		if((ducks[i].ability[0]=="swims")&&(ducks[i].ability[0]=="knows the way home"))esc++;
+		}
+		cout<<"flies => "<<fl<<endl;
+		cout<<"swims => "<<ducks.size()-fl<<endl;
+		cout<<"knows the way home => "<<kn<<endl;
+		cout<<"doesn't know the way home => "<<ducks.size()-kn<<endl;
+		if(!fl_x)cout<<"can escape => "<<esc<<endl;
+}
+
+void Lake::display_duck(int nduck){
+	ducks[nduck].display_info();
+}
+
+void Lake::add_duck(Duck *duck){
+	duck->set_lake(this);
+	ducks.push_back(*duck);
+}
+
+class Hunter{
+	public:
+	int min, max;
+	int number;
+	Farm *farm;
+	Hunter(int min, int max){
+		this->min=min;
+		this->max=max;
+	}
+	void set_farm(Farm *farm){
+		this->farm=farm;
+	}	
+	void display_info(){
+		cout<<"The hunter can catch from "<<min<<" to "<<max<<" ducks\n";
+	}
+};
+
+void Farm::add_hunter(Hunter *hunter){
+		hunters.push_back(*hunter);
+		hunter->set_farm(this);
+	}
+
+void Farm::display_hunters(){
+	for(int i=0;i<hunters.size();i++){
+		cout<<"Hunter №"<<i+1<<"\n";
+		hunters[i].display_info();
+	}
+}
+
+class Valley{
+	public:
+	int days;
+	vector <Lake> lakes;
+	vector <Farm> farms;
+	void display_info(){
+		if(days>=0)
+			cout<<"Valley has "<<lakes.size()<<" wild lakes and "<<farms.size()<<" farms, hunting season ends in "<<days<<" days\n";
+			else
+			cout<<"Valley has "<<lakes.size()<<" wild lakes and "<<farms.size()<<" farms, the hunting season is over\n";
+	}
+	void display_lake(int nlake){
+		lakes[nlake].display_info();
+	}
+	void display_farm(int nfarm){
+		farms[nfarm].display_info();
+	}
+	void display_farm_lake(Farm *farm){
+		farm->display_lake();
+	}
+	void display_farm_hunters(Farm *farm){
+		farm->display_hunters();
+	}
+	Valley(int days){
+		this->days=days;
+	}
+	void add_lake(Lake *lake){
+		lakes.push_back(*lake);
+	}
+	void add_farm(Farm *farm){
+		farms.push_back(*farm);
+	}
+	int getdays(){
+		return days;
+	}
+	void day_passes(){
+		days-=1;
+	}
+	Lake *get_lake(int nlake){
+		return &lakes[nlake];
+	}
+	Farm *get_farm(int nfarm){
+		return &farms[nfarm];
+	}
+	int getnlakes(){
+		return lakes.size();
+	}
+	int getnfarms(){
+		return farms.size();
+	}
+	int lake_get_n_ducks(Lake *lake){
+		return lake->get_n_ducks();
+	}
+	Lake *findlake(string name){
+		for(int i=0;i<lakes.size();i++){
+			if(lakes[i].name==name)
+			return &lakes[i];
+		}
+		return NULL;
+	}
+	void display_duck_by_id(int id){
+		for(int i=0;i<lakes.size();i++){
+			for(int j=0;j<lakes[i].ducks.size();j++){
+				if(lakes[i].ducks[j].id==id){
+					lakes[i].ducks[j].display_info();
+					return;
+				}
+			}
+		}
+		for(int i=0;i<farms.size();i++){
+			for(int j=0;j<farms[i].lake->ducks.size();j++){
+				if(farms[i].lake->ducks[j].id==id){
+					farms[i].lake->ducks[j].display_info();
+					return;
+				}
+			}
+		}
+		cout<<"No duck with such id\n";
+	}
+	void time_to_hunt(){
+		int k=0;
+    	mt19937 r(static_cast<unsigned int>(time(0)));
+		if(days>0)
+			for(int i=0;i<farms.size();i++){
+				uniform_int_distribution<int> dist(0,lakes.size()-1);
+				int targetlake=dist(r);
+				int caught;
+				caught=0;
+				for(int j=0;j<farms[i].hunters.size();j++){
+					uniform_int_distribution<int> dist2(farms[i].hunters[j].min,farms[i].hunters[j].max-1);
+					caught+=dist2(r);
+				}
+				if(caught>lakes[targetlake].ducks.size())caught=lakes[targetlake].ducks.size();		
+				cout<<"Hunters from the "<<farms[i].name<<" farm went to the "<<lakes[targetlake].name<<" lake and caught "<<caught<<" ducks\n";
+				vector <int> caughtvec;
+				for(int j=0;j<caught;j++){
+					uniform_int_distribution<int> dist3(0,lakes[targetlake].ducks.size()-1);		
+					int nduck=dist3(r);
+					if (find(caughtvec.begin(), caughtvec.end(), lakes[targetlake].ducks[nduck].id) != caughtvec.end()){
+						j-=1;
+						continue;
+					}
+					caughtvec.push_back(lakes[targetlake].ducks[nduck].id);
+				}
+				bool peck_bool;
+				peck_bool=false;
+				for(int j=0;j<caughtvec.size();j++){
+					for(int l=0;l<lakes[targetlake].ducks.size();l++){
+						if(lakes[targetlake].ducks[l].id==caughtvec[j]){
+							k=l;
+							break;
+						}
+					}
+					Duck duck=lakes[targetlake].ducks[k];
+					if(duck.ability[0]=="peck")
+						peck_bool=true;
+				
+					uniform_int_distribution<int> dist3(0,(peck_bool)?100:49);		
+					int chance=dist3(r);
+					if(chance>=50){
+						cout<<"Duck "<<duck.name<<"(id="<<duck.id<<") was able to bite the hunter and get away\n";
+						continue;
+					}
+					lakes[targetlake].ducks.erase(lakes[targetlake].ducks.begin()+k);
+					cout<<"Duck "<<duck.name<<"(id="<<duck.id<<") was caught";
+					if(duck.escaped){
+						duck.canescape=false;
+						cout<<" and got its wings cut\n";
+					}else{
+						cout<<"\n";
+					}
+					duck.action=true;
+					farms[i].lake->ducks.push_back(duck);					
+				}
+				caughtvec.clear();
+			}
+		for(int i=0;i<farms.size();i++){
+			for(int j=0;j<farms[i].lake->ducks.size();j++){
+				if(farms[i].lake->ducks[j].action)continue;
+				if(!farms[i].lake->ducks[j].canescape)continue;
+				uniform_int_distribution<int> dist3(0,9);
+				int chance=dist3(r);	
+				if((farms[i].lake->ducks[j].ability[0]=="swims")&&(farms[i].lake->ducks[j].ability[1]=="doesn't know the way home"))
+				if(chance<5)
+				{
+					Duck duck = farms[i].lake->ducks[j];
+					cout<<"Duck "<<duck.name<<"(id="<<duck.id<<") escaped from the "<<farms[i].name<<" farm ";
+					uniform_int_distribution<int> dist4(0,lakes.size()-1);
+					duck.home=lakes[dist4(r)].name;
+					cout<<"to a random lake called "<<duck.home<<"\n";
+					farms[i].lake->ducks.erase(farms[i].lake->ducks.begin()+j);
+					j-=1;
+					duck.escaped=true;
+					duck.action=true;
+					findlake(duck.home)->ducks.push_back(duck);
+				}
+			}
+		}
+		for(int i=0;i<farms.size();i++){
+			for(int j=0;j<farms[i].lake->ducks.size();j++){
+				farms[i].lake->ducks[j].action=false;
+			}
+		}
+		for(int i=0;i<lakes.size();i++){
+			for(int j=0;j<lakes[i].ducks.size();j++){
+				lakes[i].ducks[j].action=false;
+			}
+		}
+		days-=1;
+	}
+};
+
+int main(int argc, char** argv) {
+	Duck *duck;
+	int id=1;
+	Valley *valley = new Valley(7);
+	Lake *lake = new Lake("The Kaspiyskoe sea",true);
+	for(int i=0;i<4;i++){
+		duck=new Duck("Shilokhvost",id++);
+		duck->ability[0]="swims";
+		duck->ability[1]="knows the way home";
+		duck->attrs="Name - Villye \nWeight - 6 pd \nAge - 1 y \nBeak shape - regular\n";
+		lake->add_duck(duck);
+	}
+	for(int i=0;i<5;i++){
+		duck=new Duck("Cherneti",id++);
+		duck->ability[0]="plays";
+		duck->ability[1]="doesn't know the way home";
+		duck->attrs="Name - Alku \nWeight - 5 pd \nAgility - 2.3 \nWings color - green\n";
+		lake->add_duck(duck);
+	}
+	valley->add_lake(lake);
+	lake = new Lake("Kivu",true);
+	for(int i=0;i<4;i++){
+		duck=new Duck("Kapsky cheerok",id++);
+		duck->ability[0]="flies";
+		duck->ability[1]="doesn't know the way home";
+		duck->attrs="Name - Gosha \nWeight - 4 pd \nFeet size - 3/4 \nFeather color - regular\n";
+		lake->add_duck(duck);
+	}
+	for(int i=0;i<5;i++){
+		duck=new Duck("Khokhlataya duck",id++);
+		duck->ability[0]="quacks";
+		duck->ability[1]="doesn't know the way home";
+		duck->attrs="Name - Larry \nWeight - 7 pd \nAge - 4 y \nHobby - fishing\n";
+		lake->add_duck(duck);
+	}
+	valley->add_lake(lake);
+	lake = new Lake("Large nevolnik lake",true);
+	for(int i=0;i<4;i++){
+		duck=new Duck("Cheerok-whistler",id++);
+		duck->ability[0]="swims";
+		duck->ability[1]="doesn't know the way home";
+		duck->attrs="Name - Nelplye \nWeight - 9 pd \nWings color - white \nAgility - regular\n";
+		lake->add_duck(duck);
+	}
+	for(int i=0;i<5;i++){
+		duck=new Duck("Kapsky cheerok",id++);
+		duck->ability[0]="peck";
+		duck->ability[1]="doesn't know the way home";
+		duck->attrs="Name - Chizzee \nWeight - 5.6 pd \nTail size - 6 \nStrength - 5 A\n";
+		lake->add_duck(duck);
+	}
+	valley->add_lake(lake);
+	lake = new Lake("Toba",true);
+	for(int i=0;i<4;i++){
+		duck=new Duck("Shilokhvost",id++);
+		duck->ability[0]="swims";
+		duck->ability[1]="knows the way home";
+		duck->attrs="Name - Jester \nWeight - 5.6 pd \nFeet shape - normal \nColour - grey\n";
+		lake->add_duck(duck);
+	}
+	for(int i=0;i<5;i++){
+		duck=new Duck("Kapsky cheerok",id++);
+		duck->ability[0]="plays";
+		duck->ability[1]="doesn't know the way home";
+		duck->attrs="Name - Quackers \nWeight - 7 pd \nWings color - black \nHeight - 2 ft\n";
+		lake->add_duck(duck);
+	}
+	int maxid=id-1;
+	valley->add_lake(lake);
+	lake = new Lake("QETABI",false);
+	Farm *farm = new Farm("QETABI",lake,true);
+	Hunter *hunter = new Hunter(2,9);
+	farm->add_hunter(hunter);
+	valley->add_farm(farm);
+	string option;
+	int opt=0;
+	int state=menu1;
+	bool nextoption=true;
+	int num=0;
+	int pre_num=-1;	
+	while(1){
+		switch (state){
+			case menu1:
+				cout<<"Options:\n";
+				cout<<"1. Query valley information\n";
+				cout<<"2. Take a turn\n";
+				cout<<"3. :q!\n";
+				_flushall();
+				break;
+			case menu2:
+				cout<<"Options:\n";
+				cout<<"1. Query lake information\n";
+				cout<<"2. Query farm information\n";
+				cout<<"3. Return to main menu\n";
+				_flushall();
+				break;
+			case menu4:
+				cout<<"Options:\n";
+				cout<<"1. Query lake information\n";
+				cout<<"2. Query hunter information\n";
+				cout<<"3. Return to main menu\n";
+				_flushall();
+				break;
+			case menu3:
+				cout<<"Options:\n";
+				cout<<"1. Query duck information\n";
+				cout<<"2. Return to main menu\n";
+				_flushall();
+				break;
+			case menu5:
+				cout<<"Valley has "<<valley->getnlakes()<<" lakes\n";
+				cout<<"Enter lake number:\n";
+				_flushall();
+				break;
+			case menu7:
+				cout<<"Valley has "<<valley->getnfarms()<<" farms\n";
+				cout<<"Enter farm number:\n";
+				_flushall();
+				break;
+			case menu6:
+				cout<<"Valley has "<<valley->lake_get_n_ducks(lake)<<" ducks\n";
+				cout<<"Enter duck number:\n";
+				_flushall();
+				break;
+		}
+		cin>>option;
+		cout<<"\n";
+		if(nextoption)
+		switch(option[0]){
+			case '1':
+				switch(state){
+					case menu1:
+						valley->display_info();
+						state=menu2;	
+						break;
+					case menu2:
+						state=menu5;
+						nextoption=false;
+						break;
+					case menu3:
+						if(lake->ducks.size()==0){
+							cout<<"No ducks on this lake\n";
+							break;
+						}else{	
+							state=menu6;
+							nextoption=false;
+							break;
+						}
+					case menu4:
+						state=menu3;
+						lake=farm->lake;
+						valley->display_farm_lake(farm);
+						break;
+				}
+				break;
+			case '2':
+				switch(state){
+					case menu1:
+						valley->time_to_hunt();
+						break;
+					case menu3:
+						state=menu1;
+						break;
+					case menu2:
+						state=menu7;
+						nextoption=false;
+						break;
+					case menu4:
+						state=menu1;
+						valley->display_farm_hunters(farm);
+						break;
+				}
+				break;
+			case '3':
+				switch (state){
+					case menu1:
+						return 0;
+						break;	
+					case menu4:
+						state=menu1;
+						break;
+					case menu2:
+						state=menu1;
+						break;
+				}
+				break;		
+		}else{
+			istringstream ss(option);
+			_flushall();
+			num=-1;
+			ss>>num;
+			switch(state){
+				case menu7:
+					while(!((num>0)&&(num-1<(valley->farms.size())))){
+						cout<<"Number incorrect, try again\n";
+						cin>>option;
+						istringstream ss2(option);
+						ss2>>num;
+					}					
+					valley->display_farm(num-1);
+					state=menu4;
+					farm=valley->get_farm(num-1);
+					break;
+				case menu5:
+					while(!((num>0)&&(num-1<(valley->lakes.size())))){
+						cout<<"Number incorrect, try again\n";
+						cin>>option;
+						istringstream ss2(option);
+						ss2>>num;
+					}
+					valley->display_lake(num-1);
+					state=menu3;
+					lake=valley->get_lake(num-1);
+					break;
+				case menu6:
+					while(!((num>0)&&(num-1<(valley->lake_get_n_ducks(lake))))){
+						cout<<"Number incorrect, try again\n";
+						cin>>option;
+						istringstream ss2(option);
+						ss2>>num;
+					}
+					lake->display_duck(num-1);
+					state=menu1;
+					break;
+			}
+			nextoption=true;
+			pre_num=num;
+		}
+	}
+	return 0;
+}
